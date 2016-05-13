@@ -2,29 +2,35 @@
 
 trap 'chown -R --reference /build-scripts/build-package /out/' EXIT
 
+# condition check for 
 apt-get -y update 
-apt-get -y install php7.0 \
-                   php-pear \
+apt-get -y install php-pear \
                    ruby-dev \
                    gcc \
                    make \
-                   php7.0-dev \
                    libsodium-dbg \
                    libsodium-dev
 
-pecl install libsodium-1.0.6
 
+if [ "$RELEASE" == 'xenial' ] 
+then 
+    apt-get -y install php7.0 php7.0-dev 
+else
+    apt-get -y install php5 php5-dev 
+fi
+
+pecl install libsodium-${VERSION}
 cd /out
-
 
 EXT_DIR=$( php-config --extension-dir )
 
 fpm -s dir -t deb \
     -n php-pecl-libsodiumn  \
-    -v '1.0,6-1ubuntu1~xenial1' \
+    -v "${VERSION}-1${DISTRO}1~${RELEASE}1" \
     -a native \
-    $EXT_DIR//libsodium.so
+    $EXT_DIR/libsodium.so
 #    /usr/lib/php/20151012/libsodium.so
 
+echo "$DISTRO $RELEASE $VERSION"
 
 
