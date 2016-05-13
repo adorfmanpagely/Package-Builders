@@ -1,0 +1,30 @@
+#!/bin/bash
+
+trap 'chown -R --reference /build-scripts/build-package /out/' EXIT
+
+apt-get -y update 
+apt-get -y install php7.0 \
+                   php-pear \
+                   ruby-dev \
+                   gcc \
+                   make \
+                   php7.0-dev \
+                   libsodium-dbg \
+                   libsodium-dev
+
+pecl install libsodium-1.0.6
+
+cd /out
+
+
+EXT_DIR=$( php-config --extension-dir )
+
+fpm -s dir -t deb \
+    -n php-pecl-libsodiumn  \
+    -v '1.0,6-1ubuntu1~xenial1' \
+    -a native \
+    $EXT_DIR//libsodium.so
+#    /usr/lib/php/20151012/libsodium.so
+
+
+
