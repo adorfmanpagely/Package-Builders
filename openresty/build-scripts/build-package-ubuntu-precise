@@ -66,6 +66,25 @@ cd /out
 /usr/local/rvm/bin/rvm_fpm -s dir -t deb \
     -n openresty  \
     -v "${VERSION}-1${DISTRO}1~${RELEASE}1" \
+    --description "openresty ${VERSION}" \
+    -d libxslt1.1 \
+    -d libgd2-xpm \
+    -d libgeoip1 \
+    -d libpcre3 \
+    --conflicts nginx-extras \
+    --conflicts nginx-full \
+    --conflicts nginx-light \
+    --config-files /etc/nginx/fastcgi.conf.default \
+    --config-files /etc/nginx/win-utf \
+    --config-files /etc/nginx/fastcgi_params \
+    --config-files /etc/nginx/nginx.conf \
+    --config-files /etc/nginx/koi-win \
+    --config-files /etc/nginx/nginx.conf.default \
+    --config-files /etc/nginx/mime.types.default  \
+    --config-files /etc/nginx/koi-utf \
+    --config-files /etc/nginx/fastcgi_params.default  \
+    --config-files /etc/nginx/mime.types \
+    --config-files /etc/nginx/fastcgi.conf \
     -a native \
     -C /build/root \
     .
