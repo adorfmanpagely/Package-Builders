@@ -2,8 +2,8 @@
 
 trap 'chown -R --reference /build-scripts/build-* /out/' EXIT
 
-# condition check for 
 apt-get -y update 
+
 apt-get -y install \
      autoconf \
      binutils-doc \
@@ -29,20 +29,24 @@ apt-get -y install \
 
 mkdir /build
 mkdir /build/root
+mkdir /build/openssl
 
 cd /build
 
-wget https://openresty.org/download/openresty-${VERSION}.tar.gz
+wget https://openresty.org/download/openresty-${OR_VERSION}.tar.gz
 wget http://monitor.pagelydev.com/ngx_cache_purge-2.3.tar.gz
+wget https://www.openssl.org/source/openssl-1.0.2h.tar.gz
  
-tar -xvzf openresty-${VERSION}.tar.gz
+tar -xvzf openresty-${OR_VERSION}.tar.gz
 tar -xvzf ngx_cache_purge-2.3.tar.gz
+tar -xvzf openssl-1.0.2h.tar.gz
 
-cd openresty-${VERSION}
+cd openresty-${OR_VERSION}
 
 ./configure \
   --with-luajit \
   --add-module=../ngx_cache_purge-2.3 \
+  --with-openssl=/build/openssl-1.0.2h \
   --with-http_realip_module \
   --with-http_stub_status_module \
   --with-http_ssl_module \
@@ -65,8 +69,8 @@ cd /out
 # For precise FPM is under an RVM environemnt
 /usr/local/rvm/bin/rvm_fpm -s dir -t deb \
     -n openresty  \
-    -v "${VERSION}-1${DISTRO}1~${RELEASE}1" \
-    --description "openresty ${VERSION}" \
+    -v "${OR_VERSION}-1${DISTRO}1~${D_RELEASE}1" \
+    --description "openresty ${NGINX_OR}" \
     -d libxslt1.1 \
     -d libgd2-xpm \
     -d libgeoip1 \
@@ -89,6 +93,6 @@ cd /out
     -C /build/root \
     .
    
-echo "$DISTRO $RELEASE $VERSION"
+echo "$DISTRO $D_RELEASE $OR_VERSION"
 
 

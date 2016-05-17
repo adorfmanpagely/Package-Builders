@@ -32,13 +32,13 @@ mkdir /build/root
 
 cd /build
 
-wget https://openresty.org/download/openresty-${VERSION}.tar.gz
+wget https://openresty.org/download/openresty-${OR_VERSION}.tar.gz
 wget http://monitor.pagelydev.com/ngx_cache_purge-2.3.tar.gz
  
-tar -xvzf openresty-${VERSION}.tar.gz
+tar -xvzf openresty-${OR_VERSION}.tar.gz
 tar -xvzf ngx_cache_purge-2.3.tar.gz
 
-cd openresty-${VERSION}
+cd openresty-${OR_VERSION}
 
 ./configure \
   --with-luajit \
@@ -64,8 +64,8 @@ cd /out
 
 fpm -s dir -t deb \
     -n openresty  \
-    -v "${VERSION}-1${DISTRO}1~${RELEASE}1" \
-    --description "openresty ${VERSION}" \
+    -v "${OR_VERSION}-1${DISTRO}1~${D_RELEASE}1" \
+    --description "openresty ${OR_VERSION}" \
     -d libxslt1.1 \
     -d libgd2-xpm \
     -d libgeoip1 \
@@ -88,6 +88,6 @@ fpm -s dir -t deb \
     -C /build/root \
     .
    
-echo "$DISTRO $RELEASE $VERSION"
+echo "$DISTRO $D_RELEASE $OR_VERSION"
 
 

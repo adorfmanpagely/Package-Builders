@@ -2,8 +2,8 @@
 
 
 DISTRO='ubuntu'
-RELEASE='precise'
-VERSION='1.9.7.4'
+D_RELEASE='precise'
+OR_VERSION='1.9.7.4'
 
 for i in "$@"
 do
@@ -13,7 +13,7 @@ do
         shift 
         ;;
         -r=*|--release=*)
-        RELEASE="${i#*=}"
+        D_RELEASE="${i#*=}"
         shift  
         ;;
         -v=*|--version=*)
@@ -26,7 +26,7 @@ do
 done
 
 
-if [ $RELEASE == 'precise' ]
+if [ $D_RELEASE == 'precise' ]
 then 
    BUILDER=/build-scripts/build-package-ubuntu-precise
 else 
@@ -37,11 +37,11 @@ rm -rf out
 mkdir out
 
 docker run --rm -e DISTRO=$DISTRO \
-                -e RELEASE=$RELEASE \
-                -e VERSION=$VERSION \
+                -e D_RELEASE=$D_RELEASE \
+                -e OR_VERSION=$OR_VERSION \
                 -v $(pwd)/build-scripts:/build-scripts:ro \
                 -v $(pwd)/out:/out  \
-                -w /build-scripts ${DISTRO}-${RELEASE}-fpm-build:1 \
+                -w /build-scripts ${DISTRO}-${D_RELEASE}-fpm-build:1 \
                 $BUILDER
 
 cp out/*.deb ./
