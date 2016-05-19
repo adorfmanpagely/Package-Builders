@@ -69,6 +69,8 @@ fpm -s dir -t deb \
     -n openresty  \
     -v "${OR_VERSION}-1${DISTRO}1~${D_RELEASE}1" \
     --description "openresty ${OR_VERSION}" \
+    --maintainer "anthony.dorfman@pagely.com"
+    -url 'https://openresty.org/'
     -d libxslt1.1 \
     -d libgd2-xpm \
     -d libgeoip1 \
