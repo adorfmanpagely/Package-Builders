@@ -1,0 +1,54 @@
+#!/bin/bash
+
+trap 'chown -R --reference /build-scripts/build-* /out/' EXIT
+
+# condition check for 
+apt-get -y update 
+apt-get -y install \
+     wget 
+
+
+mkdir /build
+mkdir /build/root
+
+cd /build
+
+wget https://github.com/jedisct1/libsodium/releases/download/${LS_VERSION}/libsodium-${LS_VERSION}.tar.gz
+ 
+tar -xvzf libsodium-${LS_VERSION}.tar.gz
+
+cd libsodium-${LS_VERSION}
+
+./configure
+
+make 
+
+make check
+
+make install DESTDIR=/build/root
+
+cd /out
+
+fpm -s dir -t deb \
+    -n libsodium-dev  \
+    -v "${LS_VERSION}-1${DISTRO}1~${D_RELEASE}1" \
+    --description "libsodium-dev ${LS_VERSION}" \
+    -a native \
+    -C /build/root \
+    -x usr/local/lib/libsodium.so.* \
+    .
+
+fpm -s dir -t deb \
+    -n libsodium18  \
+    -v "${LS_VERSION}-1${DISTRO}1~${D_RELEASE}1" \
+    --description "libsodium ${LS_VERSION}" \
+    -a native \
+    -C /build/root \
+    -x usr/local/include \
+    -x usr/local/lib/libsodium*.so \
+    -x usr/local/lib/*a \
+    -x usr/local/lib/pkgconfig/libsodium.pc \
+    .
+
+   
+echo "$DISTRO $D_RELEASE $LS_VERSION"

@@ -34,9 +34,11 @@ cd /build
 
 wget https://openresty.org/download/openresty-${OR_VERSION}.tar.gz
 wget http://monitor.pagelydev.com/ngx_cache_purge-2.3.tar.gz
+wget https://www.openssl.org/source/openssl-1.0.2h.tar.gz
  
 tar -xvzf openresty-${OR_VERSION}.tar.gz
 tar -xvzf ngx_cache_purge-2.3.tar.gz
+tar -xvzf openssl-1.0.2h.tar.gz
 
 cd openresty-${OR_VERSION}
 
@@ -46,6 +48,7 @@ cd openresty-${OR_VERSION}
   --with-http_realip_module \
   --with-http_stub_status_module \
   --with-http_ssl_module \
+  --with-openssl=/build/openssl-1.0.2h \
   --http-log-path=/mnt/log/nginx/access.log \
   --error-log-path=/mnt/log/nginx/error.log \
   --conf-path=/etc/nginx/nginx.conf \
