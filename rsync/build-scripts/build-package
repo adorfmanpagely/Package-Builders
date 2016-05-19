@@ -1,0 +1,44 @@
+#!/bin/bash
+
+trap 'chown -R --reference /build-scripts/build-* /out/' EXIT
+
+# condition check for 
+apt-get -y update 
+apt-get -y install \
+     autoconf \
+     build-essential  \
+     wget \
+
+
+mkdir /build
+mkdir /build/root
+
+cd /build
+
+wget https://www.samba.org/ftp/rsync/src/rsync-${R_VERSION}.tar.gz
+
+tar -xvzf rsync-${R_VERSION}.tar.gz
+
+cd rsync-${R_VERSION}
+
+./configure 
+
+make 
+
+make install DESTDIR=/build/root
+
+cd /out
+
+fpm -s dir -t deb \
+    -n rsync  \
+    -v "${R_VERSION}-1${DISTRO}1~${D_RELEASE}1" \
+    --description "rsync ${R_VERSION}" \
+    --maintainer "anthony.dorfman@pagely.com" \
+    --url 'https://www.samba.org/rsync/' \
+    -a native \
+    -C /build/root \
+    .
+   
+echo "$DISTRO $D_RELEASE $R_VERSION"
+
+

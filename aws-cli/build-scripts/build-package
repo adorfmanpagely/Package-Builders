@@ -1,0 +1,38 @@
+#!/bin/bash
+
+trap 'chown -R --reference /build-scripts/build-* /out/' EXIT
+
+# condition check for 
+apt-get -y update 
+apt-get -y install \
+     autoconf \
+     build-essential  \
+     wget \
+     unzip \
+     python2.7
+
+
+mkdir /build
+mkdir /build/root
+
+cd /build
+
+curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+unzip awscli-bundle.zip
+./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+
+cd /out
+
+fpm -s dir -t deb \
+    -n aws-cli  \
+    -v "${AWS_VERSION}-1${DISTRO}1~${D_RELEASE}1" \
+    --description "${AWS_VERSION}" \
+    --maintainer "anthony.dorfman@pagely.com" \
+    --url 'https://s3.amazonaws.com/aws-cli/awscli-bundle.zip' \
+    -a native \
+    /usr/local/aws \
+    /usr/local/bin/aws  
+ 
+echo "$DISTRO $D_RELEASE $AWS_VERSION"
+
+
