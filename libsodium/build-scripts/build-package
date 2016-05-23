@@ -33,6 +33,7 @@ fpm -s dir -t deb \
     -n libsodium-dev  \
     -v "${LS_VERSION}-1${DISTRO}1~${D_RELEASE}1" \
     --description "libsodium-dev ${LS_VERSION}" \
+    --url 'https://github.com/jedisct1/libsodium'
     -a native \
     -C /build/root \
     -x usr/local/lib/libsodium.so.* \
@@ -42,6 +43,7 @@ fpm -s dir -t deb \
     -n libsodium18  \
     -v "${LS_VERSION}-1${DISTRO}1~${D_RELEASE}1" \
     --description "libsodium ${LS_VERSION}" \
+    --url 'https://github.com/jedisct1/libsodium'
     -a native \
     -C /build/root \
     -x usr/local/include \
