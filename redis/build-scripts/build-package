@@ -1,0 +1,96 @@
+#!/bin/bash
+
+trap 'chown -R --reference /src_dir/build-scripts/build-* /out/' EXIT
+
+set -e
+set -o pipefail
+
+# condition check for 
+apt-get -y update 
+apt-get -y install \
+     autoconf \
+     build-essential \
+     tcl8.5 \
+     lsb-release \
+     bc \
+     wget 
+
+
+RELEASE_NUMBER=`lsb_release -s -r`
+
+mkdir /build
+mkdir /build/root
+
+cd /build
+
+wget http://download.redis.io/releases/redis-${REDIS_VERSION}.tar.gz
+ 
+tar -xvzf redis-${REDIS_VERSION}.tar.gz
+
+cd redis-${REDIS_VERSION}
+
+make 
+
+make test
+
+mkdir -p /build/redis-server/user/bin
+mkdir -p /build/redis-server/etc/redis
+mkdir -p /build/redis-server/lib/systemd/system
+mkdir -p /build/redis-server/etc/init.d
+
+mkdir -p /build/redis-tools/user/bin
+mkdir -p /build/redis-tools/usr/share/bash-completion/completions
+
+mkdir -p /build/redis-sentinal/user/bin
+
+ls -al /build/redis-${REDIS_VERSION}/src/redis*
+
+cp /build/redis-${REDIS_VERSION}/src/redis-server /build/redis-server/user/bin/
+cp /src_dir/debian/redis.conf /build/redis-server/etc/redis/
+
+if (( $(echo "$RELEASE_NUMBER > 15.04" |bc -l) )); 
+then
+  cp /src_dir/debian/redis-server.service /build/redis-server/lib/systemd/system/
+else
+  cp /src_dir/debian/redis-server.init /build/redis-server/etc/init.d/redis-server
+fi
+
+
+cp /src_dir/debian/bash_completion.d/* /build/redis-tools/usr/share/bash-completion/completions
+cp /build/redis-${REDIS_VERSION}/src/redis-benchmark /build/redis-tools/user/bin/
+cp /build/redis-${REDIS_VERSION}/src/redis-check-aof /build/redis-tools/user/bin/
+cp /build/redis-${REDIS_VERSION}/src/redis-cli /build/redis-tools/user/bin/
+
+
+cd /out
+
+fpm -s dir -t deb \
+    -n redis-server  \
+    -v "${REDIS_VERSION}-1${DISTRO}1~${D_RELEASE}1" \
+    --description "redis-server ${REDIS_VERSION}" \
+    --maintainer "anthony.dorfman@pagely.com" \
+    --url 'http://http://redis.io//' \
+    -d libc6 \
+    -d libjemalloc1 \
+    -d redis-tools \
+    -a native \
+    -C /build/redis-server \
+    --after-install /src_dir/debian/redis-server.postinst \
+    --after-remove  /src_dir/debian/redis-server.postrm \
+    .
+
+fpm -s dir -t deb \
+    -n redis-tools  \
+    -v "${REDIS_VERSION}-1${DISTRO}1~${D_RELEASE}1" \
+    --description "redis-tools ${REDIS_VERSION}" \
+    --maintainer "anthony.dorfman@pagely.com" \
+    --url 'http://http://redis.io//' \
+    -d libc6 \
+    -d libjemalloc1 \
+    -a native \
+    -C /build/redis-tools \
+    .
+   
+echo "$DISTRO $D_RELEASE $OR_VERSION"
+
+

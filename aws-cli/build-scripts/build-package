@@ -2,6 +2,7 @@
 
 trap 'chown -R --reference /build-scripts/build-* /out/' EXIT
 
+
 # condition check for 
 apt-get -y update 
 apt-get -y install \
@@ -9,8 +10,17 @@ apt-get -y install \
      build-essential  \
      wget \
      unzip \
+     curl \
+     lsb-release \
+     bc \
      python2.7
 
+RELEASE_NUMBER=`lsb_release -s -r`
+
+if (( $(echo "$RELEASE_NUMBER > 12.04" |bc -l) )); 
+then
+  update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1
+fi
 
 mkdir /build
 mkdir /build/root
