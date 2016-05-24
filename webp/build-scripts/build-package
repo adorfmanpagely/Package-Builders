@@ -1,0 +1,51 @@
+#!/bin/bash
+
+trap 'chown -R --reference /build-scripts/build-* /out/' EXIT
+
+set -e
+set -o pipefail
+
+# condition check for 
+apt-get -y update 
+apt-get -y install \
+     autoconf \
+     build-essential  \
+     wget \
+     libtool \
+     nasm
+
+
+mkdir /build
+mkdir /build/root
+
+cd /build
+
+wget https://github.com/webmproject/libwebp/archive/v${W_VERSION}.tar.gz
+
+tar -xvzf v${W_VERSION}.tar.gz
+
+cd libwebp-${W_VERSION}
+
+./autogen.sh
+
+./configure --prefix=/usr
+
+make -j2
+
+make install DESTDIR=/build/root
+
+cd /out
+
+fpm -s dir -t deb \
+    -n webp  \
+    -v "${W_VERSION}-1${DISTRO}1~${D_RELEASE}1" \
+    --description "webp ${W_VERSION}" \
+    --maintainer "anthony.dorfman@pagely.com" \
+    --url 'https://github.com/webmproject/libwebp' \
+    -a native \
+    -C /build/root \
+    .
+   
+echo "$DISTRO $D_RELEASE $W_VERSION"
+
+
