@@ -1,0 +1,48 @@
+#!/bin/bash
+
+trap 'chown -R --reference /build-scripts/build-* /out/' EXIT
+
+set -e
+set -o pipefail
+
+# condition check for 
+apt-get -y update 
+apt-get -y install \
+     autoconf \
+     build-essential  \
+     wget \
+     nasm
+
+
+mkdir /build
+mkdir /build/root
+
+cd /build
+
+wget https://github.com/mozilla/mozjpeg/releases/download/v${M_VERSION}/mozjpeg-${M_VERSION}-release-source.tar.gz
+
+tar -xvzf mozjpeg-${M_VERSION}-release-source.tar.gz
+
+cd mozjpeg
+
+./configure --prefix=/usr/local/mozjpeg-${M_VERSION}
+
+make -j 2 
+
+make install DESTDIR=/build/root
+
+cd /out
+
+fpm -s dir -t deb \
+    -n mozjpeg  \
+    -v "${M_VERSION}-1${DISTRO}1~${D_RELEASE}1" \
+    --description "mozjeg ${M_VERSION}" \
+    --maintainer "anthony.dorfman@pagely.com" \
+    --url 'https://github.com/mozilla/mozjpeg' \
+    -a native \
+    -C /build/root \
+    .
+   
+echo "$DISTRO $D_RELEASE $M_VERSION"
+
+
