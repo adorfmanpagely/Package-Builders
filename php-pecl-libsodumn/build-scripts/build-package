@@ -4,7 +4,6 @@ trap 'chown -R --reference /build-scripts/build-package /out/' EXIT
 
 if [ "$RELEASE" == 'precise' ] 
 then 
-    echo 'deb http://repo.pagely.com/debrepo/pagely-ubuntu precise main' > /etc/apt/sources.list.d/pagely.list
     echo 'deb http://repo.pagely.com/debrepo/ondrej-php5-ubuntu/ precise main' >> /etc/apt/sources.list.d/pagely.list
 fi
 
@@ -36,8 +35,8 @@ fpm -s dir -t deb \
     -n php-pecl-libsodium  \
     -v "${VERSION}-1${DISTRO}1~${RELEASE}1" \
     --description "libsodium PHP Pear module ${VERSION}" \
-    --maintainer "anthony.dorfman@pagely.com"
-     --url "https://pecl.php.net/package/libsodium"
+    --maintainer "anthony.dorfman@pagely.com" \
+     --url "https://pecl.php.net/package/libsodium" \
     -a native \
     $EXT_DIR/libsodium.so
 
